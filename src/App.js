@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/auth";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import logo from "./logo.svg";
 import "./App.css";
@@ -32,7 +33,14 @@ class App extends Component {
       .onAuthStateChanged(user => this.setState({ isSignedIn: !!user }));
   }
 
-  // Make sure we un-register Firebase observers when the component unmounts.
+  async componentDidUpdate() {
+    if (!this.state.isSignedIn) return;
+
+    let token = await firebase.auth().currentUser.getIdToken();
+
+    console.log("this is token: ", token);
+  }
+
   componentWillUnmount() {
     this.unregisterAuthObserver();
   }
@@ -43,7 +51,7 @@ class App extends Component {
           <h1>My App</h1>
           <p>Please sign-in:</p>
           <StyledFirebaseAuth
-            uiConfig={this.uiConfig}
+            uiConfig={uiConfig}
             firebaseAuth={firebase.auth()}
           />
         </div>
